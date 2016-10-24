@@ -1,4 +1,4 @@
 /**
- * Package contenant le main lanceur de fenêtre, ainsi que la fenêtre du programme
+ * Package contenant la fenêtre de l'application
  */
 package ihmMPT;

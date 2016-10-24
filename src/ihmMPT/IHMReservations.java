@@ -5,18 +5,21 @@
  */
 package ihmMPT;
 
+import java.util.List;
+import java.util.Observable;
+import metier.Adherent;
+import metier.ResaController;
+import metier.Representation;
+import metier.Reservation;
 
-
-import interBD.*;
-import static interBD.interrogationBD.r;
-import static interBD.interrogationBD.r1;
-import static interBD.miseajourBD.majBdd;
 
 /**
  * Fenêtre de l'application
  * @author sociepka
  */
-public class IHMReservations extends javax.swing.JFrame {
+public class IHMReservations extends javax.swing.JFrame  implements java.util.Observer {
+     // Création du controlleur
+    private ResaController controller=new ResaController();
      
    /**
     * Constructeur avec des arguments ajoutés pour créer la fenêtre à partir de la classe "Principale"
@@ -28,30 +31,21 @@ public class IHMReservations extends javax.swing.JFrame {
         initComponents();
         
         // Construction de la liste des Adhérents
-        
-        interrogationBD.lireBdd('A',"san.Adherent");
-        for (int n=0;n<r.size();n++)
+        List<Adherent> adh=controller.getAdherents();
+        for (Adherent a:adh)
         {
-         listAdherent.addItem(r.get(n).getNomAdherent()+ " "+r.get(n).getPrenomAdherent());
-         int id = r.get(n).getNumAdherent();
-         
-         //println tests
-         //System.out.println(r.get(n).getNomAdherent()+ " "+id);
-         //System.out.println("je passe par adh");
-        }
+         listAdherent.addItem(a.getNomAdherent()+ " "+a.getPrenomAdherent());
+         int id = a.getNumAdherent();
+         }
         
         // Construction de la liste des représentations
-        
-         interrogationBD.lireBdd('R',"san.Representation");
-        for (int n=0;n<r1.size();n++)
+        List<Representation> rep=controller.getRepresentations();
+        for (Representation r:rep)
         {
-         listRepresentation.addItem(r1.get(n).getDateRepresentation()+" "+r1.get(n).getNomSpectacle());
-        int idr = r1.get(n).getNumRepresentation();
+         listRepresentation.addItem(r.getDateRepresentation()+" "+r.getNomSpectacle());
+        int idr = r.getNumRepresentation();
+         }
         
-        //println tests
-         //System.out.println(r1.get(n).getNumRepresentation()+ " "+r1.get(n).getNomSpectacle()+ " "+idr);
-         //System.out.println("je passe par rep");
-        }
         /**
         * Commande pour centrer la fenêtre dans l'écran
         */
@@ -220,61 +214,41 @@ public IHMReservations() {
     }//GEN-LAST:event_btAnnulerActionPerformed
 
     private void btValiderMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btValiderMouseClicked
+        Reservation resa=new Reservation();
 
         // récupération du numadherent
-        int adherentsel = (int) listAdherent.getSelectedIndex() ;
-        int adherentsel1= adherentsel+1;
+        resa.setNumadherent(listAdherent.getSelectedIndex()+1);
         
         // récupération du numrepresentation
-        int representationsel = (int) listRepresentation.getSelectedIndex() ;
-       int representationsel1=representationsel+1;
+       resa.setNumrepresentation(listRepresentation.getSelectedIndex()+1);
        
        // récupération du nombre de personnes
-        String nbpers = champNombrePers.getText() ;
-        int nbpers1= Integer.parseInt(nbpers);
+        resa.setNbpersonnes(Integer.parseInt(champNombrePers.getText()));
 
-        // récupération de la date du jour
-        String format = "dd/MM/yyyy"; 
-        java.text.SimpleDateFormat formater = new java.text.SimpleDateFormat( format ); 
-        java.util.Date datejour = new java.util.Date(); 
-        String datejour1 = formater.format( datejour );
-        
-        //println tests
-        //System.out.println("essai date du jour: "+datejour); 
-        //System.out.println("essai date du jour: "+ formater.format( datejour ) ); 
-        
         // Ajout des éléments de la réservation à la table RESERVATION
-        majBdd(adherentsel1,representationsel1,nbpers1,datejour1);
+        controller.addReservation(resa);
     }//GEN-LAST:event_btValiderMouseClicked
 
     private void champNombrePersFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_champNombrePersFocusLost
-        // Récupération de l'index de l'élémént sélectionné dans la combobox pour trouver le tarif
+        // Récupération de l'index de l'élément sélectionné dans la combobox pour trouver le tarif
         int representationid = (int) listRepresentation.getSelectedIndex() ;
-        interrogationBD.lireBdd('R',"san.Representation");
-        
-        // calcul du total à payer et mise de la valeur dans le champ "total"
-        String nbpers = champNombrePers.getText() ;
-        int nbpers1 = Integer.parseInt(nbpers);
-        int total = r1.get(representationid).getTarif()*nbpers1;
-        String total1 = String.valueOf(total);
+ 
+        // Récupération du nombre de personnes
+        int nbpers = Integer.parseInt(champNombrePers.getText());
         
         // Affichage du montant total dans le champ total de la fenêtre
-        champTotal.setText (total1) ;
+        champTotal.setText (String.valueOf(controller.getRepresentations().get(representationid).getTarif()*nbpers)) ;
     }//GEN-LAST:event_champNombrePersFocusLost
 
     private void champNombrePersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_champNombrePersActionPerformed
-        // Récupération de l'index de l'élémént sélectionné dans la combobox pour trouver le tarif
+        // Récupération de l'index de l'élément sélectionné dans la combobox pour trouver le tarif
         int representationid = (int) listRepresentation.getSelectedIndex() ;
-        interrogationBD.lireBdd('R',"san.Representation");
-        
-        // calcul du total à payer et mise de la valeur dans le champ "total"
-        String nbpers = champNombrePers.getText() ;
-        int nbpers1 = Integer.parseInt(nbpers);
-        int total = r1.get(representationid).getTarif()*nbpers1;
-        String total1 = String.valueOf(total);
+ 
+        // Récupération du nombre de personnes
+        int nbpers = Integer.parseInt(champNombrePers.getText());
         
         // Affichage du montant total dans le champ total de la fenêtre
-        champTotal.setText (total1) ;
+        champTotal.setText (String.valueOf(controller.getRepresentations().get(representationid).getTarif()*nbpers)) ;
     }//GEN-LAST:event_champNombrePersActionPerformed
 
     private void btAnnulerMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btAnnulerMouseClicked
@@ -329,4 +303,9 @@ public IHMReservations() {
     private javax.swing.JComboBox<String> listAdherent;
     private javax.swing.JComboBox<String> listRepresentation;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void update(Observable o, Object arg) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

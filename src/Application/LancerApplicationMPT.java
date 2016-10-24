@@ -3,18 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ihmMPT;
+package Application;
 
-import interBD.connectionBD;
-import interBD.interrogationBD;
+import ihmMPT.IHMReservations;
 
-import interBD.test;
 import java.io.IOException;
 import java.sql.SQLException;
-import static javax.swing.UIManager.getString;
-import static javax.swing.UIManager.getString;
-import static javax.swing.UIManager.getString;
-import static javax.swing.UIManager.getString;
 
 /**
  * Appelle la classe de la fenêtre de l'application
